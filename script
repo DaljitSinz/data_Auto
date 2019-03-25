@@ -1,0 +1,171 @@
+cp /tmp/logs/out.log "/tmp/logs/out_$(date +"%Y%m%dT%H%M%S%z").log"
+echo -n > /tmp/logs/out.log
+
+for line in `cat Dependency.txt`
+do
+echo "Deploying : $line Package "
+SQL=`echo $line | grep -iF "sql"`;
+PKB=`echo $line | grep -iF "pkb"`;
+PKS=`echo $line | grep -iF "pks"`;
+PRC=`echo $line | grep -iF "prc"`;
+FNC=`echo $line | grep -iF "fnc"`;
+PROG=`echo $line | grep -iF "prog"`;
+SH=`echo $line | grep -iF "sh"`;
+FNC=`echo $line | grep -iF "fnc"`;
+LDT=`echo $line | grep -iF "ldt"`;
+PRE=`echo $line | grep -iF "Pre"`;
+POST=`echo $line | grep -iF "Post"`;
+COM=`echo $line | grep -iF ".com"`;
+CMT=`echo $line | grep -iF "#"`;
+
+
+if [ "$line" == "$CMT" ]
+	then
+	continue
+
+elif [ "$line" == "$SQL" ]
+	then
+	FILE="SQL/$line"
+	echo "$FILE"
+	if [ -f "$FILE" ];
+		then
+		echo "File $FILE exist."
+		echo "SQL Package :  $line, | deploying over DEV Database started : $(date) "
+		sh /tmp/scripts/it_scripts/dev_deploy.sh @SQL/$line | more >> /tmp/logs/dev_out.log
+		echo "Package $line has been deployed $(date)"
+			if  egrep -iq 'error|ora|failure' "/tmp/logs/dev_out.log"; then
+			echo "Deployment failed on DEV for $line at $(date)"
+			break
+			fi
+	else
+		echo "File $FILE does not exist" >> /tmp/logs/dev_out.log
+		exit 1
+	fi
+
+elif [ "$line" == "$PKB" ]
+	then
+	FILE="PKB/$line"
+	if [ -f "$FILE" ];
+		then
+		echo "File $FILE exist."
+		echo "PKB Package :  $line, | deploying over DEV Database started : $(date) "
+		sh /tmp/scripts/it_scripts/dev_deploy.sh @PKB/$line | more >> /tmp/logs/dev_out.log
+		echo "Package $line has been deployed $(date)"
+			if  egrep -iq 'error|ora|failure' "/tmp/logs/dev_out.log"; then
+			echo "Deployment failed on DEV for $line at $(date)"
+			break
+			fi
+	else
+		echo "File $FILE does not exist" >> /tmp/logs/dev_out.log
+		exit 1
+	fi
+
+elif [ "$line" == "$PKS" ]
+	then
+	FILE="PKS/$line"
+	if [ -f "$FILE" ];
+		then
+		echo "File $FILE exist."
+		echo "PKS Package :  $line, | deploying over DEV Database started : $(date) "
+		sh /tmp/scripts/it_scripts/dev_deploy.sh @PKS/$line | more >> /tmp/logs/dev_out.log
+		echo "Package $line has been deployed $(date)"
+			if  egrep -iq 'error|ora|failure' "/tmp/logs/dev_out.log"; then
+			echo "Deployment failed on DEV for $line at $(date)"
+			break
+			fi
+	else
+		echo "File $FILE does not exist" >&2
+		exit 1
+	fi
+	
+elif [ "$line" == "$PRC" ]
+	then
+	FILE="PRC/$line"
+	if [ -f "$FILE" ];
+		then
+		echo "File $FILE exist."
+		echo "PRC Package :  $line, | deploying over DEV Database started : $(date) "
+		sh /tmp/scripts/it_scripts/dev_deploy.sh @PRC/$line | more >> /tmp/logs/dev_out.log
+		echo "Package $line has been deployed $(date)"
+			if  egrep -iq 'error|ora|failure' "/tmp/logs/dev_out.log"; then
+			echo "Deployment failed on DEV for $line at $(date)"
+			break
+			fi
+	else
+		echo "File $FILE does not exist" >&2
+		exit 1
+	fi
+
+elif [ "$line" == "$FNC" ]
+	then
+	FILE="FNC/$line"
+	if [ -f "$FILE" ];
+		then
+		echo "File $FILE exist."
+		echo "FNC Package :  $line, | deploying over DEV Database started : $(date) "
+		sh /tmp/scripts/it_scripts/dev_deploy.sh @FNC/$line | more >> /tmp/logs/dev_out.log
+		echo "Package $line has been deployed $(date)"
+			if  egrep -iq 'error|ora|failure' "/tmp/logs/dev_out.log"; then
+			echo "Deployment failed on DEV for $line at $(date)"
+			break
+			fi
+	else
+		echo "File $FILE does not exist" >&2
+		exit 1
+	fi
+
+elif [ "$line" == "$PROG" ]
+	then
+	FILE="PROG/$line"
+	if [ -f "$FILE" ];
+		then
+		echo "File $FILE exist."
+		echo "PROG Package :  $line, | deploying over DEV Database started : $(date) "
+		sh /tmp/scripts/it_scripts/prog.sh PROG/$line
+		echo "Package $line has been deployed $(date)"
+			if  egrep -iq 'error|ora|failure' "/tmp/logs/dev_out.log"; then
+			echo "Deployment failed on DEV for $line at $(date)"
+			break
+			fi
+	else
+		echo "File $FILE does not exist" >&2
+		exit 1
+	fi
+
+elif [ "$line" == "$LDT" ]
+	then
+	FILE="LDT/$line"
+	if [ -f "$FILE" ];
+		then
+		echo "File $FILE exist."
+		echo "LDT Package :  $line, | deploying over DEV Database started : $(date) "
+		sh /tmp/scripts/it_scripts/ldt.sh LDT/$line
+		echo "Package $line has been deployed $(date)"
+			if  egrep -iq 'error|ora|failure' "/tmp/logs/dev_out.log"; then
+			echo "Deployment failed on DEV for $line at $(date)"
+			break
+			fi
+	else
+		echo "File $FILE does not exist" >&2
+		exit 1
+	fi
+	
+	
+elif [ "$line" == "$PRE" ]
+	then
+        echo "Pre Block"
+
+elif [ "$line" == "$POST" ]
+        then
+	echo "Post Block"
+
+elif [ "$line" == "$COM" ]
+	then
+	continue
+else
+	echo "$line"
+	echo "The File extenstion type $line is not supported in this Automation script for DEV Environment $date"
+	exit 1
+break
+fi
+done
